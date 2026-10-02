@@ -4,6 +4,21 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 
 ## [Sin publicar]
 
+## [0.2.0] - 2026-10-02
+
+Primeras observaciones de uso: navegación más rápida entre meses, cumpleaños más simples y dos errores del editor corregidos.
+
+### Añadido
+- Selector de mes y año: al pulsar el título del calendario se abre una cuadrícula para saltar a cualquier mes sin ir de uno en uno. Se maneja también con el teclado.
+
+### Cambiado
+- Un cumpleaños pide solo el día y se repite cada año. La celebración, con hora de inicio y de fin, es opcional.
+- Con el aviso «¿Descartar los cambios?» a la vista, Esc significa «seguir editando».
+
+### Corregido
+- Al pasar de «Evento» a «Cumpleaños» y volver, el formulario no recuperaba sus valores: seguía en «Todo el día» y «Cada año». Ahora vuelve exactamente a como estaba.
+- Con el formulario de «Nuevo evento» modificado, una segunda pulsación de Esc dejaba el editor abierto pero invisible y el botón «Nuevo evento» dejaba de responder.
+
 ## [0.1.0] - 2026-10-02
 
 Primera versión: calendario personal para Windows, con los datos cifrados en el dispositivo.

@@ -1,6 +1,6 @@
 [package]
 name = "almanac"
-version = "0.1.0"
+version = "0.2.0"
 description = "Calendario personal rápido y cifrado"
 authors = ["UnratedNDU"]
 edition = "2021"

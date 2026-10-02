@@ -2,7 +2,7 @@
 
 Calendario personal, rápido y privado para PC y Android. Hecho con Rust y Tauri.
 
-> Estado: `v0.1.0`, primera versión para Windows. Descarga el instalador desde la sección **Releases**.
+> Estado: `v0.2.0`, versión para Windows. Descarga el instalador desde la sección **Releases**.
 
 ## Qué hace
 
@@ -10,7 +10,7 @@ Calendario personal, rápido y privado para PC y Android. Hecho con Rust y Tauri
 - Vistas de mes, semana, día y agenda.
 - Temas y colores personalizables, con pantallas de carga que muestran el progreso real.
 - Inicio de sesión local: tus datos se guardan **cifrados** (Argon2id + XChaCha20-Poly1305) y funcionan sin conexión.
-- Sincronización entre PC y móvil con cifrado de extremo a extremo (planeada para `v0.2.0`).
+- Sincronización entre PC y móvil con cifrado de extremo a extremo (planeada para `v0.3.0`).
 
 ## Desarrollo
 
@@ -35,8 +35,9 @@ npx vitest run
 | Versión | Contenido |
 |---|---|
 | `v0.1.0` | Windows: acceso local, vistas, eventos, recurrencias, temas y pantallas de carga |
-| `v0.2.0` | Sincronización con cifrado de extremo a extremo |
-| `v0.3.0` | Android y recordatorios |
+| `v0.2.0` | Selector de mes y año, cumpleaños simplificados y correcciones del editor |
+| `v0.3.0` | Sincronización con cifrado de extremo a extremo |
+| `v0.4.0` | Android y recordatorios |
 | `v1.0.0` | Importar y exportar `.ics`, pulido e instaladores para PC y móvil |
 
 ## Licencia
