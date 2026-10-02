@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <mask id="wax">
+      <rect width="1024" height="1024" fill="black"/>
+      <circle cx="512" cy="512" r="300" fill="white"/>
+      <circle cx="652" cy="464" r="290" fill="black"/>
+    </mask>
+    <linearGradient id="gold" x1="0.15" y1="0" x2="0.85" y2="1">
+      <stop offset="0" stop-color="#f7e6a8"/>
+      <stop offset="1" stop-color="#e0b84f"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="232" fill="#0b1226"/>
+  <circle cx="512" cy="512" r="300" fill="#16204a"/>
+  <circle cx="512" cy="512" r="300" fill="url(#gold)" mask="url(#wax)"/>
+</svg>

@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Almanac",
   "version": "0.1.0",
-  "identifier": "com.almanac.app",
+  "identifier": "com.unratedndu.almanac",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -20,12 +20,21 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src ipc: http://ipc.localhost"
     }
   },
   "bundle": {
     "active": true,
     "targets": "all",
+    "publisher": "UnratedNDU",
+    "copyright": "Copyright (c) 2026 UnratedNDU",
+    "category": "Productivity",
+    "shortDescription": "Calendario personal rápido y cifrado",
+    "longDescription": "Almanac es un calendario personal para Windows: eventos, fechas que se repiten solas, temas personalizables y datos cifrados en tu equipo.",
+    "windows": {
+      "nsis": { "languages": ["Spanish"], "installMode": "currentUser" },
+      "wix": { "language": "es-ES" }
+    },
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
