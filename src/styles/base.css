@@ -57,6 +57,10 @@ p {
   text-wrap: pretty;
 }
 
+fieldset {
+  position: relative;
+}
+
 button,
 input,
 select,
