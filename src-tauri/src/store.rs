@@ -61,6 +61,7 @@ impl Store {
         Self::init(conn)
     }
 
+    #[cfg(test)]
     pub fn open_memory() -> Result<Store, StoreError> {
         Self::init(Connection::open_in_memory()?)
     }
@@ -100,6 +101,12 @@ impl Store {
         Ok(changed > 0)
     }
 
+    pub fn get_record(&self, id: &str) -> Result<Option<Record>, StoreError> {
+        Ok(self
+            .conn
+            .query_row(&format!("SELECT {COLUMNS} FROM records WHERE id = ?1"), [id], from_row)
+            .optional()?)
+    }
     /// Includes tombstones (`deleted = true`).
     pub fn list_records(&self, kind: &str) -> Result<Vec<Record>, StoreError> {
         let mut stmt = self.conn.prepare(&format!("SELECT {COLUMNS} FROM records WHERE kind = ?1 ORDER BY id"))?;
@@ -107,6 +114,7 @@ impl Store {
         Ok(rows.collect::<Result<_, _>>()?)
     }
 
+    #[allow(dead_code)] // used by sync (v0.2.0)
     pub fn dirty_records(&self) -> Result<Vec<Record>, StoreError> {
         let mut stmt = self.conn.prepare(&format!("SELECT {COLUMNS} FROM records WHERE dirty = 1 ORDER BY hlc"))?;
         let rows = stmt.query_map([], from_row)?;
@@ -114,6 +122,7 @@ impl Store {
     }
 
     /// Clears `dirty` only if the stored stamp still matches, so a newer local edit stays queued.
+    #[allow(dead_code)] // used by sync (v0.2.0)
     pub fn mark_clean(&self, id: &str, hlc: &str) -> Result<(), StoreError> {
         self.conn.execute("UPDATE records SET dirty = 0 WHERE id = ?1 AND hlc = ?2", params![id, hlc])?;
         Ok(())
@@ -197,6 +206,13 @@ mod tests {
         assert!(s.dirty_records().unwrap().is_empty());
     }
 
+    #[test]
+    fn get_record_by_id() {
+        let s = Store::open_memory().unwrap();
+        s.put_record(&rec("e1", "event", "0001")).unwrap();
+        assert_eq!(s.get_record("e1").unwrap(), Some(rec("e1", "event", "0001")));
+        assert_eq!(s.get_record("missing").unwrap(), None);
+    }
     #[test]
     fn persists_across_reopen() {
         let dir = tempfile::tempdir().unwrap();

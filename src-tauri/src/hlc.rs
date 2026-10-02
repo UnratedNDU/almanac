@@ -5,6 +5,7 @@
 
 use std::time::{SystemTime, UNIX_EPOCH};
 
+#[allow(dead_code)] // used by sync (v0.2.0)
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
 pub enum HlcError {
     #[error("malformed hlc stamp")]
@@ -42,6 +43,7 @@ impl Hlc {
     }
 
     /// Advances the clock past a stamp received from another device.
+    #[allow(dead_code)] // used by sync (v0.2.0)
     pub fn observe(&mut self, remote: &str) -> Result<(), HlcError> {
         let (ms, counter) = parse(remote)?;
         if (ms, counter) > (self.last_ms, self.counter) {
@@ -66,6 +68,7 @@ impl Hlc {
     }
 }
 
+#[allow(dead_code)] // used by sync (v0.2.0)
 fn parse(stamp: &str) -> Result<(u64, u16), HlcError> {
     let mut parts = stamp.splitn(3, '-');
     let ms = parts.next().filter(|s| s.len() == 16).and_then(|s| u64::from_str_radix(s, 16).ok());
