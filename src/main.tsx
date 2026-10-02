@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./styles/base.css";
 import "./components/components.css";
+import "./screens/auth.css";
 import { applyTheme } from "./theme/applyTheme";
 import { loadRememberedTheme } from "./theme/remember";
 
