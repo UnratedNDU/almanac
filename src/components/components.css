@@ -1,0 +1,133 @@
+/* Splash */
+.splash {
+  min-height: 100dvh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1.1rem;
+  padding: max(2rem, env(safe-area-inset-top)) 1.5rem max(2rem, env(safe-area-inset-bottom));
+  text-align: center;
+}
+
+.splash__name {
+  font-size: clamp(2rem, 6vw, 2.75rem);
+  letter-spacing: -0.01em;
+}
+
+.splash__status {
+  min-height: 1.5em;
+  color: var(--ink-2);
+}
+
+.splash .progress {
+  width: min(18rem, 70vw);
+}
+
+.splash__help {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  max-width: 24rem;
+  color: var(--ink-2);
+}
+
+/* Moon: the lit disc is masked by a shadow disc that slides away as progress grows. */
+.moon {
+  filter: drop-shadow(0 0 18px color-mix(in oklab, var(--accent) 35%, transparent));
+}
+
+.moon__dark {
+  fill: var(--surface-2);
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.moon__lit {
+  fill: var(--accent);
+}
+
+.moon__shadow {
+  transition: transform 700ms var(--ease);
+}
+
+.moon--loop .moon__shadow {
+  animation: moon-wax 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes moon-wax {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-92px);
+  }
+}
+
+/* Progress bar */
+.progress {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.progress__fill {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transform-origin: left center;
+  transition: transform 400ms var(--ease);
+}
+
+.progress__fill--loop {
+  width: 40%;
+  animation: progress-slide 1.4s ease-in-out infinite;
+}
+
+@keyframes progress-slide {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
+  }
+}
+
+/* Skeleton */
+.skeleton {
+  background: var(--surface-2);
+  border-radius: var(--r-sm);
+  animation: skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .moon__shadow {
+    transition: none;
+  }
+
+  .moon--loop .moon__shadow {
+    animation: none;
+    transform: translateX(-46px);
+  }
+
+  .progress__fill {
+    transition: none;
+  }
+
+  .progress__fill--loop {
+    width: 100%;
+    opacity: 0.4;
+    animation: none;
+  }
+
+  .skeleton {
+    animation: none;
+  }
+}

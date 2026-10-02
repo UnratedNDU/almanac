@@ -46,6 +46,7 @@ pub struct Category {
 pub struct Settings {
     /// `system`, `light`, `dark`, `midnight`, `forest`, `sunset` or `paper`.
     pub theme: String,
+    /// Hex color, or empty to use the theme's own accent.
     pub accent: String,
     /// `comfortable` or `compact`.
     pub density: String,
@@ -53,17 +54,20 @@ pub struct Settings {
     /// 0 = Sunday .. 6 = Saturday.
     pub week_start: u8,
     pub auto_lock_minutes: u32,
+    /// Show the four principal moon phases on the calendar.
+    pub show_moon: bool,
 }
 
 impl Default for Settings {
     fn default() -> Self {
         Self {
             theme: "system".into(),
-            accent: "#5b7cfa".into(),
+            accent: String::new(),
             density: "comfortable".into(),
             font_scale: 1.0,
             week_start: 1,
             auto_lock_minutes: 5,
+            show_moon: true,
         }
     }
 }
@@ -91,5 +95,6 @@ mod tests {
     fn settings_default_is_sensible() {
         let s: Settings = serde_json::from_str("{}").unwrap();
         assert_eq!((s.theme.as_str(), s.week_start, s.auto_lock_minutes), ("system", 1, 5));
+        assert!(s.accent.is_empty() && s.show_moon);
     }
 }
