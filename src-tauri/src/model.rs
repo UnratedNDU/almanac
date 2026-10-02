@@ -97,4 +97,38 @@ mod tests {
         assert_eq!((s.theme.as_str(), s.week_start, s.auto_lock_minutes), ("system", 1, 5));
         assert!(s.accent.is_empty() && s.show_moon);
     }
+
+    fn keys(value: &impl Serialize) -> Vec<String> {
+        let mut keys: Vec<String> = serde_json::to_value(value).unwrap().as_object().unwrap().keys().cloned().collect();
+        keys.sort();
+        keys
+    }
+
+    fn sorted(names: &[&str]) -> Vec<String> {
+        let mut names: Vec<String> = names.iter().map(|n| n.to_string()).collect();
+        names.sort();
+        names
+    }
+
+    // These three tests pin the JSON the UI relies on (see src/types.ts). Renaming a field here breaks the app silently otherwise.
+    #[test]
+    fn event_json_keys_match_the_ui() {
+        assert_eq!(
+            keys(&Event::default()),
+            sorted(&["id", "title", "notes", "start", "end", "allDay", "color", "categoryId", "kind", "rrule", "exdates", "reminderMinutes"])
+        );
+    }
+
+    #[test]
+    fn category_json_keys_match_the_ui() {
+        assert_eq!(keys(&Category::default()), sorted(&["id", "name", "color"]));
+    }
+
+    #[test]
+    fn settings_json_keys_match_the_ui() {
+        assert_eq!(
+            keys(&Settings::default()),
+            sorted(&["theme", "accent", "density", "fontScale", "weekStart", "autoLockMinutes", "showMoon"])
+        );
+    }
 }

@@ -536,4 +536,25 @@ mod tests {
         v.unlock(PASSWORD).unwrap();
         assert_eq!(titles(&v.list_occurrences("2026-08-01", "2026-09-01").unwrap()), vec!["Persistent"]);
     }
+
+    #[test]
+    fn error_json_has_a_stable_code_and_message_for_the_ui() {
+        let json = serde_json::to_value(VaultError::BadPassword).unwrap();
+        assert_eq!(json, serde_json::json!({ "code": "badPassword", "message": "wrong password" }));
+        assert_eq!(VaultError::Locked.code(), "locked");
+        assert_eq!(VaultError::NotFound.code(), "notFound");
+    }
+
+    #[test]
+    fn occurrence_json_keys_match_the_ui() {
+        let (mut v, _) = with_account();
+        v.save_event(event("Keys", "2026-08-20")).unwrap();
+        let occurrences = v.list_occurrences("2026-08-01", "2026-09-01").unwrap();
+        let mut keys: Vec<String> = serde_json::to_value(&occurrences[0]).unwrap().as_object().unwrap().keys().cloned().collect();
+        keys.sort();
+        let mut expected: Vec<String> =
+            ["eventId", "start", "end", "recurring", "title", "color", "kind", "allDay", "categoryId"].iter().map(|k| k.to_string()).collect();
+        expected.sort();
+        assert_eq!(keys, expected);
+    }
 }
