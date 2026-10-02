@@ -2,7 +2,7 @@
 
 Calendario personal, rápido y privado para PC y Android. Hecho con Rust y Tauri.
 
-> Estado: desarrollo temprano. La primera versión (`v0.1.0`) está en preparación.
+> Estado: `v0.1.0`, primera versión para Windows. Descarga el instalador desde la sección **Releases**.
 
 ## Qué hace
 
