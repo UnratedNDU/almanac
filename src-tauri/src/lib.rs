@@ -1,6 +1,7 @@
 mod crypto;
 mod hlc;
 mod model;
+mod recur;
 mod store;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
