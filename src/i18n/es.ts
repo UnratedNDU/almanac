@@ -64,6 +64,9 @@ export const t = {
     ready: "Listo",
     loadError: "No se pudieron cargar los eventos.",
     loadingEvents: "Cargando eventos…",
+    pickMonth: "Elegir mes y año",
+    previousYear: "Año anterior",
+    nextYear: "Año siguiente",
   },
   moon: { new: "Luna nueva", first: "Cuarto creciente", full: "Luna llena", last: "Cuarto menguante" },
   kinds: { event: "Evento", birthday: "Cumpleaños", anniversary: "Aniversario", special: "Fecha especial" },
@@ -76,7 +79,8 @@ export const t = {
     "#14a3a3": "Turquesa",
     "#8e5bd9": "Violeta",
     "#d9529c": "Rosa",
-  } as Record<string, string>,  editor: {
+  } as Record<string, string>,
+  editor: {
     newTitle: "Nuevo evento",
     editTitle: "Editar evento",
     close: "Cerrar",
@@ -88,6 +92,11 @@ export const t = {
     endLabel: "Termina",
     date: "Fecha",
     time: "Hora",
+    birthdayDate: "Día del cumpleaños",
+    celebration: "Hay una celebración ese día",
+    celebrationFrom: "Desde",
+    celebrationTo: "Hasta",
+    birthdayRepeats: "Se repite todos los años.",
     repeat: "Se repite",
     repeats: { NONE: "No se repite", DAILY: "Cada día", WEEKLY: "Cada semana", MONTHLY: "Cada mes", YEARLY: "Cada año" },
     every: "Repetir cada",
@@ -151,7 +160,8 @@ export const t = {
       ["N", "Nuevo evento"],
     ] as [string, string][],
     saveFailed: "No se pudo guardar el cambio.",
-  },  /** Messages for the error codes the vault returns. */
+  },
+  /** Messages for the error codes the vault returns. */
   errors: {
     locked: "Almanac está bloqueado. Desbloquéalo para continuar.",
     badPassword: "La contraseña no es correcta.",

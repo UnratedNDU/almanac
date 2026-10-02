@@ -33,6 +33,108 @@
   letter-spacing: -0.01em;
 }
 
+.cal__title h1 {
+  font-size: inherit;
+}
+
+.cal__titlebtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: 100%;
+  margin-inline: -0.5rem;
+  padding: 0.1rem 0.5rem;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  text-align: left;
+  letter-spacing: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease);
+}
+
+.cal__titlebtn svg {
+  flex: none;
+  color: var(--ink-2);
+  transition: transform 0.2s var(--ease);
+}
+
+.cal__titlebtn:hover {
+  background: var(--surface-2);
+}
+
+.cal__title:has(.monthpick:popover-open) .cal__titlebtn svg {
+  transform: rotate(180deg);
+}
+
+/* The month and year grid; a native popover, so it sits above everything and closes on Escape or an outside click. */
+.monthpick {
+  width: min(19rem, calc(100vw - 1.5rem));
+  margin: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 14px 36px rgb(0 0 0 / 0.28);
+}
+
+@supports (anchor-name: --a) {
+  .cal__titlebtn {
+    anchor-name: --cal-title;
+  }
+
+  .monthpick {
+    position-anchor: --cal-title;
+    inset: auto;
+    top: calc(anchor(bottom) + 0.5rem);
+    left: anchor(left);
+    position-try-fallbacks: flip-block;
+  }
+}
+
+.monthpick__year {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.monthpick__yearnum {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.monthpick__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.3rem;
+}
+
+.monthpick__month {
+  min-height: 2.7rem;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  font-weight: 560;
+  cursor: pointer;
+  transition: background-color 0.15s var(--ease), color 0.15s var(--ease);
+}
+
+.monthpick__month:hover {
+  background: var(--surface-2);
+}
+
+.monthpick__month[aria-current="date"] {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.monthpick__month[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
 .cal__nav {
   order: 1;
   display: flex;

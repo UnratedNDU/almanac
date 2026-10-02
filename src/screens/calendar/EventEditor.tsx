@@ -6,8 +6,7 @@ import { Skeleton } from "../../components/Skeleton";
 import { TextField } from "../../components/TextField";
 import { errorMessage, t } from "../../i18n/es";
 import { EVENT_COLORS } from "../../lib/colors";
-import { draftFromForm, formForNew, formFromEvent, type EventForm } from "../../lib/eventForm";
-import { defaultsForKind } from "../../lib/recurrenceForm";
+import { draftFromForm, formForNew, formFromEvent, switchKind, type EventForm } from "../../lib/eventForm";
 import { useLoader } from "../../lib/useLoader";
 import { useStalled } from "../../lib/useStalled";
 import type { CalendarEvent, Category, EventKind } from "../../types";
@@ -75,24 +74,13 @@ export function EventEditor({ target, categories, onClose, onSaved }: EventEdito
   const dirty = form !== null && initial.current !== null && JSON.stringify(form) !== initial.current;
 
   function requestClose() {
-    if (dirty && busy === null) setDiscarding(true);
+    // Escape on the "discard changes?" question means "keep editing".
+    if (discarding) setDiscarding(false);
+    else if (dirty && busy === null) setDiscarding(true);
     else onClose();
   }
 
-  function pickKind(kind: EventKind) {
-    const defaults = defaultsForKind(kind);
-    setForm((current) =>
-      current
-        ? {
-            ...current,
-            kind,
-            allDay: defaults.allDay ?? current.allDay,
-            recurrence:
-              defaults.freq !== undefined ? { ...current.recurrence, freq: defaults.freq, unsupported: false } : current.recurrence,
-          }
-        : current,
-    );
-  }
+  const pickKind = (kind: EventKind) => setForm((current) => (current ? switchKind(current, kind) : current));
 
   async function run(kind: "saving" | "removing", action: () => Promise<unknown>) {
     setFormError(undefined);
@@ -222,40 +210,65 @@ export function EventEditor({ target, categories, onClose, onSaved }: EventEdito
             ))}
           </fieldset>
 
-          <label className="check">
-            <input type="checkbox" checked={form.allDay} disabled={busy !== null} onChange={(event) => update({ allDay: event.target.checked })} />
-            <span>{t.editor.allDay}</span>
-          </label>
-
-          <fieldset className="when">
-            <legend className="field__label">{t.editor.startLabel}</legend>
-            <div className="row2">
-              <Labeled label={t.editor.date} error={errors.start}>
+          {form.kind === "birthday" ? (
+            <>
+              <Labeled label={t.editor.birthdayDate} error={errors.start}>
                 <input className="field__input" type="date" name="start-date" autoComplete="off" value={form.startDate} disabled={busy !== null} onChange={(e) => update({ startDate: e.target.value })} />
               </Labeled>
+              <label className="check">
+                <input type="checkbox" checked={!form.allDay} disabled={busy !== null} onChange={(event) => update({ allDay: !event.target.checked })} />
+                <span>{t.editor.celebration}</span>
+              </label>
               {!form.allDay && (
-                <Labeled label={t.editor.time}>
-                  <input className="field__input" type="time" name="start-time" autoComplete="off" value={form.startTime} disabled={busy !== null} onChange={(e) => update({ startTime: e.target.value })} />
-                </Labeled>
+                <div className="row2">
+                  <Labeled label={t.editor.celebrationFrom}>
+                    <input className="field__input" type="time" name="start-time" autoComplete="off" value={form.startTime} disabled={busy !== null} onChange={(e) => update({ startTime: e.target.value })} />
+                  </Labeled>
+                  <Labeled label={t.editor.celebrationTo} error={errors.end}>
+                    <input className="field__input" type="time" name="end-time" autoComplete="off" value={form.endTime} disabled={busy !== null} onChange={(e) => update({ endTime: e.target.value })} />
+                  </Labeled>
+                </div>
               )}
-            </div>
-          </fieldset>
+              <p className="field__hint">{t.editor.birthdayRepeats}</p>
+            </>
+          ) : (
+            <>
+              <label className="check">
+                <input type="checkbox" checked={form.allDay} disabled={busy !== null} onChange={(event) => update({ allDay: event.target.checked })} />
+                <span>{t.editor.allDay}</span>
+              </label>
 
-          <fieldset className="when">
-            <legend className="field__label">{t.editor.endLabel}</legend>
-            <div className="row2">
-              <Labeled label={t.editor.date} error={errors.end}>
-                <input className="field__input" type="date" name="end-date" autoComplete="off" value={form.endDate} min={form.startDate} disabled={busy !== null} onChange={(e) => update({ endDate: e.target.value })} />
-              </Labeled>
-              {!form.allDay && (
-                <Labeled label={t.editor.time}>
-                  <input className="field__input" type="time" name="end-time" autoComplete="off" value={form.endTime} disabled={busy !== null} onChange={(e) => update({ endTime: e.target.value })} />
-                </Labeled>
-              )}
-            </div>
-          </fieldset>
+              <fieldset className="when">
+                <legend className="field__label">{t.editor.startLabel}</legend>
+                <div className="row2">
+                  <Labeled label={t.editor.date} error={errors.start}>
+                    <input className="field__input" type="date" name="start-date" autoComplete="off" value={form.startDate} disabled={busy !== null} onChange={(e) => update({ startDate: e.target.value })} />
+                  </Labeled>
+                  {!form.allDay && (
+                    <Labeled label={t.editor.time}>
+                      <input className="field__input" type="time" name="start-time" autoComplete="off" value={form.startTime} disabled={busy !== null} onChange={(e) => update({ startTime: e.target.value })} />
+                    </Labeled>
+                  )}
+                </div>
+              </fieldset>
 
-          <RecurrenceFields value={form.recurrence} onChange={(recurrence) => update({ recurrence })} startDate={form.startDate} disabled={busy !== null} />
+              <fieldset className="when">
+                <legend className="field__label">{t.editor.endLabel}</legend>
+                <div className="row2">
+                  <Labeled label={t.editor.date} error={errors.end}>
+                    <input className="field__input" type="date" name="end-date" autoComplete="off" value={form.endDate} min={form.startDate} disabled={busy !== null} onChange={(e) => update({ endDate: e.target.value })} />
+                  </Labeled>
+                  {!form.allDay && (
+                    <Labeled label={t.editor.time}>
+                      <input className="field__input" type="time" name="end-time" autoComplete="off" value={form.endTime} disabled={busy !== null} onChange={(e) => update({ endTime: e.target.value })} />
+                    </Labeled>
+                  )}
+                </div>
+              </fieldset>
+
+              <RecurrenceFields value={form.recurrence} onChange={(recurrence) => update({ recurrence })} startDate={form.startDate} disabled={busy !== null} />
+            </>
+          )}
           {recurring && <p className="field__hint">{t.editor.seriesNote}</p>}
 
           <fieldset className="swatches">

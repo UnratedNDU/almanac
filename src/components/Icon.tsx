@@ -1,6 +1,7 @@
 const ICONS = {
   chevronLeft: <path d="M15 5l-7 7 7 7" />,
   chevronRight: <path d="M9 5l7 7-7 7" />,
+  chevronDown: <path d="M5 9l7 7 7-7" />,
   plus: <path d="M12 5v14M5 12h14" />,
   sliders: (
     <>

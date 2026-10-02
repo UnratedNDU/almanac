@@ -43,11 +43,21 @@ export function Sheet({ title, onClose, onRequestClose, children, footer, onSubm
       ref={ref}
       className="sheet"
       aria-labelledby={titleId}
+      onKeyDown={(event) => {
+        // Handling the key itself matters: Chromium closes a modal dialog on a second Escape even when `cancel` was
+        // prevented, which would leave the owner thinking the sheet is still open.
+        if (event.key === "Escape") {
+          event.preventDefault();
+          requestClose();
+        }
+      }}
       onCancel={(event) => {
-        // Escape: keep the dialog open and let the owner decide.
+        // Other close requests (the Android back button): keep the dialog open and let the owner decide.
         event.preventDefault();
         requestClose();
       }}
+      // Safety net: if the browser closes the dialog anyway, the owner must hear about it.
+      onClose={onClose}
       onClick={(event) => {
         if (event.target === event.currentTarget) requestClose();
       }}

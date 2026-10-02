@@ -14,6 +14,7 @@ import type { Category, OccurrenceView, Settings } from "../../types";
 import { SettingsPanel } from "../SettingsPanel";
 import { AgendaView } from "./AgendaView";
 import { EventEditor, type EditorTarget } from "./EventEditor";
+import { MonthPicker } from "./MonthPicker";
 import { MonthView } from "./MonthView";
 import { moveCursor, rangeFor, titleFor } from "./range";
 import { TimeGrid } from "./TimeGrid";
@@ -114,7 +115,7 @@ function Calendar({ initial, onLock }: { initial: Startup; onLock: () => void })
         {t.cal.skipLink}
       </a>
       <header className="cal__bar">
-        <h1 className="cal__title">{titleFor(view, cursor, settings.weekStart)}</h1>
+        <MonthPicker title={titleFor(view, cursor, settings.weekStart)} cursor={cursor} onPick={setCursor} />
         <div className="cal__nav">
           <button type="button" className="icon-btn" aria-label={t.cal.previous} onClick={() => go(-1)}>
             <Icon name="chevronLeft" />

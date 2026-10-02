@@ -1,9 +1,58 @@
 import { describe, expect, it } from "vitest";
 import type { CalendarEvent } from "../types";
-import { draftFromForm, formForNew, formFromEvent, type EventForm } from "./eventForm";
+import { draftFromForm, formForNew, formFromEvent, switchKind, type EventForm } from "./eventForm";
 import { parseRrule } from "./recurrenceForm";
 
 const filled = (patch: Partial<EventForm> = {}): EventForm => ({ ...formForNew("2026-08-20", 9), title: "Dentist", ...patch });
+
+describe("switchKind", () => {
+  it("applies the defaults of the chosen kind", () => {
+    const birthday = switchKind(filled(), "birthday");
+    expect(birthday).toMatchObject({ kind: "birthday", allDay: true });
+    expect(birthday.recurrence.freq).toBe("YEARLY");
+    expect(switchKind(filled(), "special")).toMatchObject({ kind: "special", allDay: true });
+  });
+
+  it("returns to a plain event exactly as it was, so the editor is not left dirty", () => {
+    const weekly = filled({ recurrence: parseRrule("FREQ=WEEKLY;BYDAY=TH") });
+    const back = switchKind(switchKind(weekly, "birthday"), "event");
+    expect(JSON.stringify(back)).toBe(JSON.stringify(weekly));
+  });
+
+  it("goes back to a timed, non-repeating event when there was no plain event to restore", () => {
+    const stored = filled({ kind: "birthday", allDay: true, recurrence: parseRrule("FREQ=YEARLY") });
+    expect(switchKind(stored, "event")).toMatchObject({ kind: "event", allDay: false, recurrence: { freq: "NONE" } });
+  });
+
+  it("keeps the plain event through several kind changes", () => {
+    const form = filled({ allDay: false });
+    const back = switchKind(switchKind(switchKind(form, "birthday"), "anniversary"), "event");
+    expect(back).toMatchObject({ kind: "event", allDay: false, recurrence: { freq: "NONE" } });
+  });
+});
+
+describe("draftFromForm for a birthday", () => {
+  const birthday = (patch: Partial<EventForm> = {}) => filled({ kind: "birthday", allDay: true, endDate: "2026-09-30", ...patch });
+
+  it("is one all-day date that repeats every year, whatever the stale end date and repeat settings say", () => {
+    const form = birthday({ recurrence: parseRrule("FREQ=WEEKLY;INTERVAL=2;BYDAY=TH") });
+    expect(draftFromForm(form)).toMatchObject({ ok: true, draft: { start: "2026-08-20", end: null, allDay: true, rrule: "FREQ=YEARLY" } });
+  });
+
+  it("can have an optional celebration with a start and an end time on the same day", () => {
+    const form = birthday({ allDay: false, startTime: "13:00", endTime: "16:00" });
+    expect(draftFromForm(form)).toMatchObject({ ok: true, draft: { start: "2026-08-20T13:00", end: "2026-08-20T16:00", allDay: false, rrule: "FREQ=YEARLY" } });
+  });
+
+  it("allows a celebration without an end time", () => {
+    const form = birthday({ allDay: false, startTime: "13:00", endTime: "" });
+    expect(draftFromForm(form)).toMatchObject({ ok: true, draft: { start: "2026-08-20T13:00", end: null } });
+  });
+
+  it("rejects a celebration that ends before it starts", () => {
+    expect(draftFromForm(birthday({ allDay: false, startTime: "16:00", endTime: "13:00" }))).toEqual({ ok: false, errors: { end: "endBeforeStart" } });
+  });
+});
 
 describe("formForNew", () => {
   it("starts at the given hour and lasts one hour", () => {

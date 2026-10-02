@@ -17,6 +17,12 @@ export function weekRange(first: Date, last: Date): string {
   return `${format.formatRange(first, last)} ${last.getFullYear()}`;
 }
 
+/** Short month names, January first. */
+export function monthLabels(): string[] {
+  const format = new Intl.DateTimeFormat(LOCALE, { month: "short" });
+  return Array.from({ length: 12 }, (_, m) => upperFirst(format.format(new Date(2024, m, 1))));
+}
+
 /** Weekday names starting at `weekStart` (0 = Sunday). */
 export function weekdayLabels(weekStart: number, style: "short" | "long" | "narrow"): string[] {
   const format = new Intl.DateTimeFormat(LOCALE, { weekday: style });

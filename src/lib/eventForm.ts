@@ -1,5 +1,5 @@
 import type { CalendarEvent, EventDraft, EventKind } from "../types";
-import { buildRrule, parseRrule, type RecurrenceForm } from "./recurrenceForm";
+import { buildRrule, defaultsForKind, parseRrule, type RecurrenceForm } from "./recurrenceForm";
 
 export interface EventForm {
   title: string;
@@ -14,6 +14,8 @@ export interface EventForm {
   /** Empty means no category. */
   categoryId: string;
   recurrence: RecurrenceForm;
+  /** The plain event's all-day flag and repeat rule, kept while another kind is chosen so coming back restores them. */
+  plain?: Pick<EventForm, "allDay" | "recurrence">;
 }
 
 const DEFAULT_HOUR = 9;
@@ -47,6 +49,21 @@ export function formFromEvent(ev: CalendarEvent): EventForm {
   };
 }
 
+/** Applies what choosing `kind` implies for the other fields; going back to "event" restores what it had. */
+export function switchKind(form: EventForm, kind: EventKind): EventForm {
+  if (kind === form.kind) return form;
+  const { plain, ...rest } = form;
+  if (kind === "event") return { ...rest, kind, ...(plain ?? { allDay: false, recurrence: parseRrule(null) }) };
+  const defaults = defaultsForKind(kind);
+  return {
+    ...rest,
+    kind,
+    plain: form.kind === "event" ? { allDay: form.allDay, recurrence: form.recurrence } : plain,
+    allDay: defaults.allDay ?? form.allDay,
+    recurrence: defaults.freq === undefined ? form.recurrence : { ...form.recurrence, freq: defaults.freq, unsupported: false },
+  };
+}
+
 export type FormErrors = { title?: "titleRequired"; start?: "startRequired"; end?: "endBeforeStart" };
 
 export type DraftResult =
@@ -59,16 +76,21 @@ export function draftFromForm(form: EventForm, base?: CalendarEvent): DraftResul
   const title = form.title.trim();
   if (!title) errors.title = "titleRequired";
 
+  // A birthday is one date that repeats every year; its only extra is an optional celebration time that day.
+  const birthday = form.kind === "birthday";
+  const endDate = birthday ? form.startDate : form.endDate;
+  const recurrence = birthday ? parseRrule("FREQ=YEARLY") : form.recurrence;
+
   if (!form.startDate || (!form.allDay && !form.startTime)) errors.start = "startRequired";
   const start = form.allDay ? form.startDate : `${form.startDate}T${form.startTime}`;
   let end: string | null;
-  if (form.allDay) end = form.endDate > form.startDate ? form.endDate : null;
-  else end = form.endDate && form.endTime ? `${form.endDate}T${form.endTime}` : null;
-  const endsBefore = form.allDay ? Boolean(form.endDate) && form.endDate < form.startDate : end !== null && end < start;
+  if (form.allDay) end = endDate > form.startDate ? endDate : null;
+  else end = endDate && form.endTime ? `${endDate}T${form.endTime}` : null;
+  const endsBefore = form.allDay ? Boolean(endDate) && endDate < form.startDate : end !== null && end < start;
   if (endsBefore) errors.end = "endBeforeStart";
   if (errors.title || errors.start || errors.end) return { ok: false, errors };
 
-  const keepStoredRule = form.recurrence.unsupported && form.recurrence.freq === "NONE";
+  const keepStoredRule = recurrence.unsupported && recurrence.freq === "NONE";
   return {
     ok: true,
     draft: {
@@ -82,7 +104,7 @@ export function draftFromForm(form: EventForm, base?: CalendarEvent): DraftResul
       end,
       color: form.color,
       categoryId: form.categoryId || null,
-      rrule: keepStoredRule ? (base?.rrule ?? null) : buildRrule(form.recurrence),
+      rrule: keepStoredRule ? (base?.rrule ?? null) : buildRrule(recurrence),
       exdates: base?.exdates ?? [],
     },
   };
