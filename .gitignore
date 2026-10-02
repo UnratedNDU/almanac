@@ -1,0 +1,38 @@
+# Dependencies and build output
+node_modules/
+dist/
+dist-ssr/
+target/
+
+# Secrets and signing material: never commit
+.env
+.env.*
+*.pem
+*.key
+*.jks
+*.keystore
+*.p12
+
+# Installers: published only as GitHub Release assets
+*.exe
+*.msi
+*.apk
+*.aab
+*.dmg
+*.AppImage
+*.deb
+
+# Logs, editors, OS
+logs/
+*.log
+npm-debug.log*
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.local
+
+# Assistant files: not part of the product
+CLAUDE.md
+.claude/
