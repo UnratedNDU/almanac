@@ -1072,6 +1072,46 @@ kbd {
   letter-spacing: 0.04em;
 }
 
+.skip {
+  position: absolute;
+  top: -4rem;
+  left: 0.75rem;
+  z-index: 10;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--r-md);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 560;
+}
+
+.skip:focus {
+  top: 0.75rem;
+}
+
+.tg__slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--hour);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.tg__slot:hover {
+  background: color-mix(in oklab, var(--accent) 7%, transparent);
+}
+
+.block,
+.pill {
+  scroll-margin-top: 6rem;
+}
+
+.day {
+  position: relative;
+}
+
 /* ---------- Narrow screens ---------- */
 @media (max-width: 640px) {
   :root {
@@ -1114,6 +1154,12 @@ kbd {
 
   .month {
     min-height: 24rem;
+  }
+
+  .day__num::after {
+    content: "";
+    position: absolute;
+    inset: 0;
   }
 
   .day {

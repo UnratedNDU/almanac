@@ -94,15 +94,19 @@ export function TimeGrid({ days, occurrences, categories, onOpen, onCreate, onPi
               ))}
             </div>
             {isos.map((iso) => (
-              <div
-                key={iso}
-                className="tg__col"
-                onClick={(event) => {
-                  if (event.target !== event.currentTarget) return;
-                  const box = event.currentTarget.getBoundingClientRect();
-                  onCreate(iso, Math.floor(((event.clientY - box.top) / box.height) * HOURS));
-                }}
-              >
+              <div key={iso} className="tg__col">
+                {/* Pointer shortcut; keyboard users create events with the New event button or the N key. */}
+                {Array.from({ length: HOURS }, (_, hour) => (
+                  <button
+                    key={hour}
+                    type="button"
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    className="tg__slot"
+                    style={{ top: `calc(var(--hour) * ${hour})` }}
+                    onClick={() => onCreate(iso, hour)}
+                  />
+                ))}
                 {blocksFor(byDay.get(iso) ?? [], iso).map(({ id, col, cols, item }) => {
                   const o = item.occurrence;
                   const title = o.title || t.cal.untitled;

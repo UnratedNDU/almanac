@@ -110,6 +110,9 @@ function Calendar({ initial, onLock }: { initial: Startup; onLock: () => void })
 
   return (
     <div className="cal">
+      <a className="skip" href="#main">
+        {t.cal.skipLink}
+      </a>
       <header className="cal__bar">
         <h1 className="cal__title">{titleFor(view, cursor, settings.weekStart)}</h1>
         <div className="cal__nav">
@@ -144,7 +147,7 @@ function Calendar({ initial, onLock }: { initial: Startup; onLock: () => void })
         </div>
       </header>
 
-      <main className="cal__main">
+      <main className="cal__main" id="main" tabIndex={-1}>
         {loading && data !== null && (
           <div className="cal__progress">
             <ProgressBar label={t.cal.loadingEvents} />

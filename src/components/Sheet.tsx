@@ -4,17 +4,21 @@ import { Icon } from "./Icon";
 
 interface SheetProps {
   title: string;
+  /** Called once the sheet is really closing. */
   onClose: () => void;
+  /** Called when the user asks to close (close button, Escape, backdrop). Defaults to `onClose`; use it to confirm first. */
+  onRequestClose?: () => void;
   children: ReactNode;
   footer?: ReactNode;
   /** When given, the sheet is a form and this runs on submit. */
   onSubmit?: (event: FormEvent) => void;
 }
 
-/** A modal dialog on the native `<dialog>`: focus is trapped, Escape closes it and the page behind is inert. */
-export function Sheet({ title, onClose, children, footer, onSubmit }: SheetProps) {
+/** A modal dialog on the native `<dialog>`: focus is trapped, the page behind is inert, and Escape asks to close. */
+export function Sheet({ title, onClose, onRequestClose, children, footer, onSubmit }: SheetProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  const requestClose = onRequestClose ?? onClose;
 
   useEffect(() => {
     const dialog = ref.current;
@@ -25,7 +29,7 @@ export function Sheet({ title, onClose, children, footer, onSubmit }: SheetProps
     <>
       <header className="sheet__head">
         <h2 id={titleId}>{title}</h2>
-        <button type="button" className="icon-btn" aria-label={t.editor.close} onClick={() => ref.current?.close()}>
+        <button type="button" className="icon-btn" aria-label={t.editor.close} onClick={requestClose}>
           <Icon name="close" />
         </button>
       </header>
@@ -39,9 +43,13 @@ export function Sheet({ title, onClose, children, footer, onSubmit }: SheetProps
       ref={ref}
       className="sheet"
       aria-labelledby={titleId}
-      onClose={onClose}
+      onCancel={(event) => {
+        // Escape: keep the dialog open and let the owner decide.
+        event.preventDefault();
+        requestClose();
+      }}
       onClick={(event) => {
-        if (event.target === event.currentTarget) ref.current?.close();
+        if (event.target === event.currentTarget) requestClose();
       }}
     >
       {onSubmit ? (

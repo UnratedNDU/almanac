@@ -16,7 +16,7 @@ export function Splash({ label, progress, stalled, error, onRetry }: SplashProps
   return (
     <main className="splash">
       <Moon lit={progress} />
-      <h1 className="splash__name">{t.appName}</h1>
+      <h1 className="splash__name" translate="no">{t.appName}</h1>
       <p className="splash__status" role="status">
         {label}
       </p>

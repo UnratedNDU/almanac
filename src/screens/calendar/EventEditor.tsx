@@ -52,6 +52,8 @@ export function EventEditor({ target, categories, onClose, onSaved }: EventEdito
   const [busy, setBusy] = useState<"saving" | "removing" | null>(null);
   const [confirming, setConfirming] = useState(false);
   const stalled = useStalled(busy !== null);
+  const [discarding, setDiscarding] = useState(false);
+  const initial = useRef<string | null>(null);
   const titleRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -65,6 +67,17 @@ export function EventEditor({ target, categories, onClose, onSaved }: EventEdito
   }, [hasForm]);
 
   const update = (changes: Partial<EventForm>) => setForm((current) => (current ? { ...current, ...changes } : current));
+
+  // Remember the form as first shown, to know whether closing would lose edits.
+  useEffect(() => {
+    if (form && initial.current === null) initial.current = JSON.stringify(form);
+  }, [form]);
+  const dirty = form !== null && initial.current !== null && JSON.stringify(form) !== initial.current;
+
+  function requestClose() {
+    if (dirty && busy === null) setDiscarding(true);
+    else onClose();
+  }
 
   function pickKind(kind: EventKind) {
     const defaults = defaultsForKind(kind);
@@ -144,7 +157,7 @@ export function EventEditor({ target, categories, onClose, onSaved }: EventEdito
           </div>
         ))}
       <div className="sheet__right">
-        <button type="button" className="btn" onClick={onClose}>
+        <button type="button" className="btn" onClick={requestClose}>
           {t.editor.cancel}
         </button>
         <button type="submit" className="btn btn--primary" disabled={busy !== null || !form}>
@@ -154,8 +167,19 @@ export function EventEditor({ target, categories, onClose, onSaved }: EventEdito
     </>
   );
 
+  const discardFooter = (
+    <div className="sheet__confirm" role="group" aria-label={t.editor.discard}>
+      <span>{t.editor.discard}</span>
+      <button type="button" className="btn btn--danger" onClick={onClose}>
+        {t.editor.discardYes}
+      </button>
+      <button type="button" className="btn" onClick={() => setDiscarding(false)}>
+        {t.editor.discardNo}
+      </button>
+    </div>
+  );
   return (
-    <Sheet title={isNew ? t.editor.newTitle : t.editor.editTitle} onClose={onClose} onSubmit={submit} footer={footer}>
+    <Sheet title={isNew ? t.editor.newTitle : t.editor.editTitle} onClose={onClose} onRequestClose={requestClose} onSubmit={submit} footer={discarding ? discardFooter : footer}>
       {!form ? (
         loader.state.status === "error" ? (
           <div className="stack">

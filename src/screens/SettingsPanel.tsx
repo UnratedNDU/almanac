@@ -120,7 +120,7 @@ export function SettingsPanel({ settings, categories, onSettings, onCategories, 
 
         <div className="field">
           <label htmlFor="font-scale" className="field__label">
-            {t.settings.fontSize} <output>{Math.round(settings.fontScale * 100)} %</output>
+            {t.settings.fontSize} <output>{Math.round(settings.fontScale * 100)}&nbsp;%</output>
           </label>
           <input
             id="font-scale"

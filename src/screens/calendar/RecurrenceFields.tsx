@@ -74,6 +74,8 @@ export function RecurrenceFields({ value, onChange, startDate, disabled }: Recur
                 type="number"
                 min={1}
                 max={99}
+                name="interval"
+                autoComplete="off"
                 inputMode="numeric"
                 value={value.interval}
                 disabled={disabled}
@@ -124,6 +126,8 @@ export function RecurrenceFields({ value, onChange, startDate, disabled }: Recur
                 <input
                   className="field__input"
                   type="date"
+                  name="until"
+                  autoComplete="off"
                   aria-label={t.editor.recurrenceEnds.until}
                   value={value.until ?? ""}
                   min={startDate}
@@ -138,6 +142,8 @@ export function RecurrenceFields({ value, onChange, startDate, disabled }: Recur
                     type="number"
                     min={1}
                     max={999}
+                    name="count"
+                    autoComplete="off"
                     inputMode="numeric"
                     aria-label={t.editor.recurrenceEnds.count}
                     value={value.count ?? 1}

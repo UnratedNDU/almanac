@@ -39,13 +39,7 @@ export function MonthView({ occurrences, categories, settings, cursor, loadingFi
               const hidden = Math.max(0, items.length - maxPills);
               const classes = ["day", outside && "day--outside", iso === todayIso && "day--today"].filter(Boolean).join(" ");
               return (
-                <div
-                  key={iso}
-                  role="gridcell"
-                  className={classes}
-                  onClick={narrow ? () => onPickDay(date) : undefined}
-                  onDoubleClick={narrow ? undefined : () => onCreate(iso)}
-                >
+                <div key={iso} role="gridcell" className={classes}>
                   <div className="day__top">
                     <button
                       type="button"
