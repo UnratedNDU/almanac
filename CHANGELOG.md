@@ -4,6 +4,18 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/) y 
 
 ## [Sin publicar]
 
+## [0.3.0] - 2026-10-02
+
+Almanac avisa cuando hay una versión nueva y guarda dentro de la app el registro de cambios.
+
+### Añadido
+- Aviso «Hay una nueva versión» en el calendario, con las novedades de esa versión y un botón que abre la página de descarga. «Ahora no» lo oculta hasta la siguiente versión.
+- Registro de novedades dentro de la app (Ajustes, «Acerca de Almanac», «Novedades»). Se abre solo la primera vez que abres Almanac después de actualizar y muestra lo que cambió desde tu versión anterior.
+- «Acerca de Almanac» en Ajustes: versión instalada, «Buscar actualizaciones» y una casilla para no buscar al abrir. Solo se consulta la lista pública de versiones en GitHub; no se envía nada de tu calendario.
+
+### Cambiado
+- La política de seguridad de la app permite conectar con `api.github.com` (solo para esa consulta) y abrir en el navegador las páginas de este repositorio.
+
 ## [0.2.0] - 2026-10-02
 
 Primeras observaciones de uso: navegación más rápida entre meses, cumpleaños más simples y dos errores del editor corregidos.

@@ -6,6 +6,9 @@ const upperFirst = (text: string) => text.charAt(0).toUpperCase() + text.slice(1
 export const monthYear = (d: Date) =>
   upperFirst(new Intl.DateTimeFormat(LOCALE, { month: "long", year: "numeric" }).format(d));
 
+export const dateMedium = (d: Date) =>
+  new Intl.DateTimeFormat(LOCALE, { day: "numeric", month: "long", year: "numeric" }).format(d);
+
 export const dayLong = (d: Date) =>
   upperFirst(new Intl.DateTimeFormat(LOCALE, { weekday: "long", day: "numeric", month: "long" }).format(d));
 

@@ -1,10 +1,13 @@
 import { useState, type CSSProperties } from "react";
 import { api, asApiError } from "../api";
+import { ProgressBar } from "../components/ProgressBar";
 import { Sheet } from "../components/Sheet";
 import { TextField } from "../components/TextField";
 import { errorMessage, t } from "../i18n/es";
+import { APP_VERSION } from "../lib/appVersion";
 import { EVENT_COLORS } from "../lib/colors";
 import { FONT_SCALE_RANGE, resolveTheme } from "../theme/applyTheme";
+import type { Updates } from "../state/useUpdates";
 import { PRESETS, PRESET_IDS, type PresetId } from "../theme/presets";
 import type { Category, Density, Settings, ThemeId } from "../types";
 
@@ -13,6 +16,11 @@ interface SettingsPanelProps {
   categories: Category[];
   onSettings: (next: Settings) => void;
   onCategories: (next: Category[]) => void;
+  updates: Updates;
+  /** Opens the change log. */
+  onShowNews: () => void;
+  /** Opens the notes of the newer version found. */
+  onShowUpdate: () => void;
   onClose: () => void;
 }
 
@@ -35,7 +43,7 @@ function ThemeSample({ id }: { id: PresetId }) {
     </span>
   );
 }
-export function SettingsPanel({ settings, categories, onSettings, onCategories, onClose }: SettingsPanelProps) {
+export function SettingsPanel({ settings, categories, onSettings, onCategories, updates, onShowNews, onShowUpdate, onClose }: SettingsPanelProps) {
   const [error, setError] = useState<string>();
   const [name, setName] = useState("");
   const [color, setColor] = useState<string>(EVENT_COLORS[0]);
@@ -214,7 +222,7 @@ export function SettingsPanel({ settings, categories, onSettings, onCategories, 
         </p>
       </section>
 
-      <section className="set-section set-section--last">
+      <section className="set-section">
         <h3>{t.settings.shortcuts}</h3>
         <dl className="shortcuts">
           {t.settings.shortcutList.map(([keys, action]) => (
@@ -226,6 +234,44 @@ export function SettingsPanel({ settings, categories, onSettings, onCategories, 
             </div>
           ))}
         </dl>
+      </section>
+
+      <section className="set-section set-section--last">
+        <h3>{t.about.title}</h3>
+        <p>{t.about.version(APP_VERSION)}</p>
+        <div className="inline">
+          <button type="button" className="btn" disabled={updates.state.status === "checking"} onClick={() => void updates.check()}>
+            {t.updates.check}
+          </button>
+          <button type="button" className="btn" onClick={onShowNews}>
+            {t.updates.news}
+          </button>
+        </div>
+        <div className="about__status" aria-live="polite">
+          {updates.state.status === "checking" && (
+            <>
+              <ProgressBar label={t.updates.checking} />
+              <p className="field__hint">{t.updates.checking}</p>
+            </>
+          )}
+          {updates.state.status === "upToDate" && <p>{t.updates.upToDate}</p>}
+          {updates.state.status === "failed" && <p className="auth__error">{t.updates.failed}</p>}
+          {updates.state.status === "available" && (
+            <>
+              <p>{t.updates.available(updates.state.version)}</p>
+              <div>
+                <button type="button" className="btn btn--primary" onClick={onShowUpdate}>
+                  {t.updates.seeNews}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+        <label className="check">
+          <input type="checkbox" checked={updates.auto} onChange={(event) => updates.setAuto(event.target.checked)} />
+          <span>{t.updates.auto}</span>
+        </label>
+        <p className="field__hint">{t.updates.privacy}</p>
       </section>
     </Sheet>
   );

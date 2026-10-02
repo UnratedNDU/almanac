@@ -3,15 +3,19 @@ import { api, asApiError } from "../../api";
 import { Icon } from "../../components/Icon";
 import { ProgressBar } from "../../components/ProgressBar";
 import { Splash } from "../../components/Splash";
+import { APP_VERSION } from "../../lib/appVersion";
+import { markVersionSeen } from "../../lib/localPrefs";
 import { errorMessage, t } from "../../i18n/es";
 import { toIsoDate, weekDays } from "../../lib/dates";
 import { useShortcuts } from "../../state/useShortcuts";
 import { useOccurrences } from "../../state/useOccurrences";
 import { useStartup, type Startup } from "../../state/useStartup";
 import { useAutoLock } from "../../state/useAutoLock";
+import { useUpdates } from "../../state/useUpdates";
 import { useTheme } from "../../theme/useTheme";
 import type { Category, OccurrenceView, Settings } from "../../types";
 import { SettingsPanel } from "../SettingsPanel";
+import { UpdateSheet, WhatsNewSheet } from "../ReleaseSheets";
 import { AgendaView } from "./AgendaView";
 import { EventEditor, type EditorTarget } from "./EventEditor";
 import { MonthPicker } from "./MonthPicker";
@@ -22,6 +26,9 @@ import type { View, ViewProps } from "./types";
 import "./calendar.css";
 
 const VIEWS: View[] = ["month", "week", "day", "agenda"];
+
+/** Which release-notes sheet is open: the change log, the notes of a newer version, or what changed since an update. */
+type NotesView = { kind: "history" } | { kind: "update" } | { kind: "updated"; since: string } | null;
 
 const startOfToday = () => {
   const now = new Date();
@@ -54,9 +61,18 @@ function Calendar({ initial, onLock }: { initial: Startup; onLock: () => void })
   const [editor, setEditor] = useState<EditorTarget | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [saveError, setSaveError] = useState<string>();
+  const [notes, setNotes] = useState<NotesView>(null);
+  const updates = useUpdates();
+  const available = updates.state.status === "available" ? updates.state : null;
 
   useTheme(settings);
   useAutoLock(settings.autoLockMinutes, onLock);
+
+  // Right after an update, show what changed.
+  useEffect(() => {
+    const previous = markVersionSeen(APP_VERSION);
+    if (previous !== null) setNotes({ kind: "updated", since: previous });
+  }, []);
 
   const { from, to } = useMemo(() => rangeFor(view, cursor, settings.weekStart), [view, cursor, settings.weekStart]);
   const { data, loading, error } = useOccurrences(from, to, version);
@@ -93,7 +109,7 @@ function Calendar({ initial, onLock }: { initial: Startup; onLock: () => void })
       a: () => setView("agenda"),
       n: () => openNew(toIsoDate(cursor)),
     },
-    editor === null && !settingsOpen,
+    editor === null && !settingsOpen && notes === null,
   );
 
   const days = useMemo(() => weekDays(cursor, settings.weekStart), [cursor, settings.weekStart]);
@@ -154,6 +170,19 @@ function Calendar({ initial, onLock }: { initial: Startup; onLock: () => void })
             <ProgressBar label={t.cal.loadingEvents} />
           </div>
         )}
+        {available && available.version !== updates.dismissed && (
+          <div className="cal__update" role="status">
+            <span>{t.updates.available(available.version)}</span>
+            <div className="cal__update-actions">
+              <button type="button" className="btn btn--primary" onClick={() => setNotes({ kind: "update" })}>
+                {t.updates.seeNews}
+              </button>
+              <button type="button" className="icon-btn" aria-label={t.updates.later} onClick={() => updates.dismiss(available.version)}>
+                <Icon name="close" />
+              </button>
+            </div>
+          </div>
+        )}
         {failure && (
           <div className="cal__banner" role="alert">
             <span>{failure}</span>
@@ -189,8 +218,26 @@ function Calendar({ initial, onLock }: { initial: Startup; onLock: () => void })
             setCategories(next);
             reload();
           }}
+          updates={updates}
+          onShowNews={() => setNotes({ kind: "history" })}
+          onShowUpdate={() => setNotes({ kind: "update" })}
           onClose={() => setSettingsOpen(false)}
         />
+      )}
+      {notes?.kind === "update" && available && (
+        <UpdateSheet
+          version={available.version}
+          notes={available.notes}
+          url={available.url}
+          onLater={() => {
+            updates.dismiss(available.version);
+            setNotes(null);
+          }}
+          onClose={() => setNotes(null)}
+        />
+      )}
+      {(notes?.kind === "history" || notes?.kind === "updated") && (
+        <WhatsNewSheet since={notes.kind === "updated" ? notes.since : null} onClose={() => setNotes(null)} />
       )}
     </div>
   );

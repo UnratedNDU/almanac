@@ -1298,3 +1298,94 @@ kbd {
     opacity: 1;
   }
 }
+
+/* ---------- Updates and release notes ---------- */
+.cal__update {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem 0.75rem;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0.6rem 0.5rem 0.9rem;
+  border: 1px solid var(--accent);
+  border-radius: var(--r-md);
+  background: color-mix(in oklab, var(--accent) 10%, var(--surface));
+}
+
+.cal__update-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.about__status {
+  display: grid;
+  gap: 0.5rem;
+  min-height: 1.5rem;
+}
+
+.release {
+  display: grid;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.release:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.release__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+}
+
+.release__head h3 {
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.release__head time {
+  color: var(--ink-2);
+  font-size: 0.9rem;
+}
+
+.badge {
+  padding: 0.05rem 0.55rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.notes {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 62ch;
+  overflow-wrap: anywhere;
+}
+
+.notes h4 {
+  margin: 0.4rem 0 0;
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.notes ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.notes code {
+  padding: 0.05rem 0.35rem;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  font-size: 0.9em;
+}
